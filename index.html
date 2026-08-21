@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Calcule sua taxa real</title>
+
+<!-- Uso pessoal offline: sem manifesto/service worker externos, sem fontes externas —
+     tudo funciona a partir deste único arquivo, sem internet. -->
+<meta name="theme-color" content="#10192E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Taxa Real">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAERklEQVR4nO3csW4TQRCH8TGioiGUocsLhDdC4smQeCOeIB0toqGmCDLG9px9d/ufnZ39vjaK76T93dzq4tzh4fHZiK71pvcJUN7AQW7gIDdwkBs4yA0c5AYOcnvb9/Dvn754P/r18jXyTOiyQ5eHYAsmLkNJr6JxrGJxGkTiC91zbJax83dpW0GTo+HSMkLCipgcbS96RkhYchyKtcRHTFoculXER0A8BCM3IQ71xc3wUKfCEbNy+JDGbYXcJDgiL2iGhy4mB7mBg9za44if89xZRDE5yA0c5AYOcgMHuYGD3MBBbuAgN3CQW3sc8d/x5Fulopgc5AYOcpPgiJzz3FN0MTnITYUj5oJmbEgTTg71yiFDHbcVctPi0F3cjI2A5JNDsYrIiCnittJ2LZERVujLW3Z+2RMWwYVuSPesbm0ZP398730KV+KdYP07yvjw8VPfMzmrD45jvE3wbGak8tEZx+RdvZvk8cFDsG55+4w8+w9w9GlZQBIf4OjQzbVPcmcBR3SjyDBwBDeQDANHZGPJMHCENZwMA0dMI8owcAQ0qAwDh7pxZRg4pA0tw8Cha3QZBg5RBWQYOBTVkGHgaF4ZGQaOtlWSYeBoWDEZBo5W1ZNh4GhSSRkGjv1VlWHg2FlhGQaOPdWWYeDYXHkZBo5tzSDDwLGhSWQYONY2jwwDx6qmkmHguL/ZZBg47mxCGQaOe5pThoHjZtPKMHAsN7MMA8dCk8swcHghw8BxNWS8Bo7zkHEMHP+FjNPA8S9knAWOvyHjMnCYIcMJHMhwmx0HMhaaGgcylpsXBzJuNikOZNzTjDiQcWfT4UDG/c2FAxmrmggHMtY2Cw5kbGgKHMjYVn0cyNhccRzI2FNlHMjYWVkcyNhfTRzIaFJBHMhoVTUcyGhYKRzIaFsdHMhoXhEcyFBUAQcyRA2PAxm6xsaBDGkD40CGulFxICOgIXEgI6bxcCAjrMFwICOykXAgI7hhcCAjvjFwIKNLA+BARq+y40BGx1LjQEbf8uJARveS4kBGhjLiQEaS0uFARp5y4UBGqhLhQEa2suBARsJS4EBGzvrjQEba+uNYXntkdOzw8Pjc+xzMnPkxiYxvT7+9H31+eRd5JmdlwWEXPsrLWDBxWRcliXDYiY/aMlaxOC2YSP89x2mvJpCh+N0N5ZoctWu4tDEjJNfkKFzbiz5mhIAjIsVaBvgAhzzdKqp9gIPcwKFNfXFLPx8cwmK2jbqjgIPcwKEq8oGV6FjgIDdwkBs4JAX/EUR0RHCQGzjIDRzkBg5yAwe5gYPcwEFu4CA3cEiK/08CxRHBQW7gIDdwqIq8s4iOBQ5yA4ewmOGhOwo4tKl9SD8fHOQGDnm6i1s9lsARkWIVAzY04Aiq7VrGbHV5BUN0O7/sGfn4hMkR3Z7VDf6TDZOjW7wTjG7H2wRpvNhzkBs4yA0c5AYOcgMHuYGD3MBBbn8AbsGngHlcEjQAAAAASUVORK5CYII=">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Taxa Real">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+  :root{
+    --bg:#F4F5F1;
+    --ink:#10192E;
+    --ink-soft:#3B4459;
+    --paper:#FFFFFF;
+    --line:#E1E0D4;
+    --muted:#6B7280;
+    --alert:#B23A24;
+    --alert-bg:#FBEAE5;
+    --real:#146B4E;
+    --real-bg:#E6F3EC;
+    --accent:#1F3A8F;
+    --font-display:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    padding:calc(32px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+  }
+  .wrap{max-width:1040px;margin:0 auto;}
+  .top{margin-bottom:28px;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:32px;
+    line-height:1.15;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:15px;
+    color:var(--ink-soft);
+    max-width:640px;
+    line-height:1.55;
+    margin:0;
+  }
+  .tabs{
+    display:flex;
+    gap:4px;
+    margin:28px 0 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    color:var(--muted);
+    background:none;
+    border:none;
+    padding:12px 4px;
+    margin-right:24px;
+    cursor:pointer;
+    position:relative;
+    top:1px;
+  }
+  .tab.active{
+    color:var(--ink);
+    border-bottom:2px solid var(--accent);
+  }
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .grid{
+    display:grid;
+    grid-template-columns:minmax(280px,380px) 1fr;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width:760px){.grid{grid-template-columns:1fr;}}
+  .form-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px 22px 24px;
+  }
+  .field{margin-bottom:18px;}
+  .field:last-child{margin-bottom:0;}
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .hint{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4;}
+  .input-row{position:relative;}
+  input[type=number]{
+    width:100%;
+    font-family:var(--font-mono);
+    font-size:16px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:var(--bg);
+    color:var(--ink);
+    outline:none;
+  }
+  input[type=number]:focus{border-color:var(--accent);}
+  .suffix{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--muted);
+    pointer-events:none;
+  }
+  .err{font-size:12px;color:var(--alert);margin-top:5px;display:none;}
+  /* receipt */
+  .receipt-holder{position:relative;}
+  .receipt{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px 10px 0 0;
+    padding:26px 26px 18px;
+    position:relative;
+  }
+  .receipt::after{
+    content:"";
+    display:block;
+    position:absolute;
+    left:0;right:0;bottom:-9px;
+    height:18px;
+    background:
+      radial-gradient(circle at 9px 0, transparent 9px, var(--paper) 9.5px) top left/18px 18px repeat-x;
+  }
+  .receipt-tear{height:10px;}
+  .stamp{
+    display:inline-block;
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:100px;
+    background:var(--accent);
+    color:#fff;
+    margin-bottom:16px;
+  }
+  .headline-rate{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin:2px 0 4px;
+    flex-wrap:wrap;
+  }
+  .headline-rate .num{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:44px;
+    line-height:1;
+    color:var(--alert);
+  }
+  .headline-rate .label{
+    font-size:14px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .nominal-line{
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 20px;
+    font-family:var(--font-mono);
+  }
+  .ledger{
+    border-top:1px dashed var(--line);
+    padding-top:14px;
+    margin-top:6px;
+  }
+  .ledger-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    padding:6px 0;
+    color:var(--ink-soft);
+  }
+  .ledger-row.strong{
+    color:var(--ink);
+    font-weight:600;
+    border-top:1px solid var(--line);
+    margin-top:6px;
+    padding-top:12px;
+    font-size:14.5px;
+  }
+  .ledger-row .tag-alert{color:var(--alert);}
+  .ledger-row .tag-real{color:var(--real);}
+  .table-wrap{
+    margin-top:22px;
+    overflow-x:auto;
+    border-radius:8px;
+    border:1px solid var(--line);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    min-width:520px;
+  }
+  th{
+    text-align:right;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    background:var(--bg);
+    padding:9px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  th:first-child,td:first-child{text-align:left;}
+  td{
+    text-align:right;
+    padding:8px 12px;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+  }
+  tr:last-child td{border-bottom:none;}
+  .note{
+    margin-top:18px;
+    font-size:12px;
+    line-height:1.55;
+    color:var(--muted);
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+  }
+  .note b{color:var(--ink-soft);}
+  .simple-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px;
+  }
+  .metrics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:20px;
+  }
+  .metric{
+    background:var(--bg);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .metric .m-label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;}
+  .metric .m-val{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--ink);}
+  .metric.hot .m-val{color:var(--alert);}
+  .rank-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rank-row:last-child{border-bottom:none;}
+  .rank-row .rk-name{font-weight:600;font-size:14px;}
+  .rank-row .rk-name .badge{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    font-weight:600;
+    color:var(--real);
+    background:var(--real-bg);
+    padding:2px 8px;
+    border-radius:100px;
+    margin-left:8px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .rank-row .rk-sub{font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:3px;}
+  .rank-row .rk-val{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--ink);}
+  .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .seg-btn{
+    flex:1;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    background:var(--bg);
+    border:none;
+    padding:9px 8px;
+    cursor:pointer;
+    border-right:1px solid var(--line);
+  }
+  .seg-btn:last-child{border-right:none;}
+  .seg-btn.active{background:var(--accent);color:#fff;}
+  .required-mark{color:var(--alert);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <p class="eyebrow">Uso pessoal · Funciona offline</p>
+    <h1>Calcule sua taxa real</h1>
+    <p class="sub">Taxa mensal + antecipação automática quase nunca é igual à taxa que você pensa que está pagando. Simule abaixo e veja a diferença, linha por linha. Tudo roda no seu celular — nada é salvo nem enviado a lugar nenhum.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="t1">Taxa mensal + antecipação</button>
+    <button class="tab" data-tab="t2">Valor bruto vs. líquido</button>
+    <button class="tab" data-tab="t4">Quanto preciso vender</button>
+    <button class="tab" data-tab="t5">Comparar propostas</button>
+  </div>
+
+  <!-- CALCULADORA 1 -->
+  <div class="panel active" id="t1">
+    <div class="grid">
+      <div class="form-card">
+        <div class="field">
+          <label for="c1-bruto">Valor da venda (bruto)</label>
+          <div class="input-row">
+            <span class="suffix" style="left:12px;right:auto;">R$</span>
+            <input type="number" id="c1-bruto" value="1000" min="1" step="1" style="padding-left:36px;">
+          </div>
+          <p class="err" id="c1-bruto-err">Informe um valor de venda válido.</p>
+        </div>
+
+        <div class="field">
+          <label>Como a taxa foi contratada?</label>
+          <div class="seg" id="c1-mode-toggle">
+            <button type="button" class="seg-btn active" data-mode="combo">Mensal + antecipação</button>
+            <button type="button" class="seg-btn" data-mode="final">Taxa final direta</button>
+          </div>
+        </div>
+
+        <div id="c1-fields-combo">
+          <div id="c1-tier-fields">
+            <div class="field">
+              <label for="c1-tier1">Taxa na 1ª parcela <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+              <div class="input-row">
+                <input type="number" id="c1-tier1" value="1.50" min="0" step="0.01">
+                <span class="suffix">% a.m.</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="c1-tier2">Taxa de 2ª a 6ª parcela <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+              <div class="input-row">
+                <input type="number" id="c1-tier2" value="2.20" min="0" step="0.01">
+                <span class="suffix">% a.m.</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="c1-tier3">Taxa de 7ª a 12ª parcela (ou mais) <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+              <div class="input-row">
+                <input type="number" id="c1-tier3" value="2.80" min="0" step="0.01">
+                <span class="suffix">% a.m.</span>
+              </div>
+              <p class="hint">Usada também para parcelas além da 12ª, se houver. Deixe em branco a faixa que não se aplica — a simulação usa só as faixas preenchidas.</p>
+              <p class="err" id="c1-tiers-err">As taxas por faixa não podem ser negativas.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="c1-antecip">Taxa de antecipação</label>
+            <div class="input-row">
+              <input type="number" id="c1-antecip" value="1.99" min="0" step="0.01">
+              <span class="suffix">% a.m.</span>
+            </div>
+            <p class="hint">A taxa cobrada para receber cada parcela antes do prazo original.</p>
+            <p class="err" id="c1-antecip-err">Informe uma taxa de antecipação válida (não pode ser negativa).</p>
+          </div>
+        </div>
+
+        <div id="c1-fields-final" style="display:none;">
+          <div class="field">
+            <label for="c1-final-taxa">Taxa final contratada</label>
+            <div class="input-row">
+              <input type="number" id="c1-final-taxa" value="4.5" min="0" step="0.01">
+              <span class="suffix">%</span>
+            </div>
+            <p class="hint">A taxa única já contratada pelo cliente, sem separar mensal de antecipação.</p>
+            <p class="err" id="c1-final-taxa-err">Informe uma taxa final válida (não pode ser negativa).</p>
+          </div>
+          <div class="field">
+            <label for="c1-final-prazo">Prazo de recebimento <span class="required-mark">*</span></label>
+            <div class="input-row">
+              <span class="suffix" style="left:12px;right:auto;">D+</span>
+              <input type="number" id="c1-final-prazo" value="1" min="0" step="1" style="padding-left:34px;">
+            </div>
+            <p class="hint">Obrigatório nesta opção — em quantos dias o cliente recebe (D+1, D+2, D+30...).</p>
+            <p class="err" id="c1-final-prazo-err">Informe o prazo de recebimento.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="c1-parcelas">Número de parcelas</label>
+          <div class="input-row">
+            <input type="number" id="c1-parcelas" value="6" min="1" max="24" step="1">
+            <span class="suffix">x</span>
+          </div>
+          <p class="err" id="c1-err">Informe parcelas entre 1 e 24.</p>
+        </div>
+      </div>
+
+      <div class="receipt-holder">
+        <div class="receipt">
+          <span class="stamp">Taxa real da operação</span>
+          <div class="headline-rate">
+            <span class="num" id="c1-taxareal">3,4%</span>
+            <span class="label">de desconto total sobre o valor bruto</span>
+          </div>
+          <p class="nominal-line" id="c1-nominal">Taxa anunciada: 2,00% a.m. · Antecipação: 1,99% a.m.</p>
+
+          <div class="ledger">
+            <div class="ledger-row"><span>Valor bruto da venda</span><span id="c1-l-bruto">R$ 1.000,00</span></div>
+            <div class="ledger-row"><span id="c1-l-mensal-label">(–) Taxa mensal contratada (parcelamento)</span><span id="c1-l-mensal">R$ 0,00</span></div>
+            <div class="ledger-row" id="c1-l-antecip-row"><span class="tag-alert">(–) Custo da antecipação automática</span><span class="tag-alert" id="c1-l-antecip">R$ 0,00</span></div>
+            <div class="ledger-row strong"><span class="tag-real">Total recebido líquido</span><span class="tag-real" id="c1-l-liquido">R$ 0,00</span></div>
+          </div>
+        </div>
+        <div class="receipt-tear"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Parcela</th><th>Bruto</th><th id="c1-th-mensal">Após taxa mensal</th><th id="c1-th-antecip">Custo antecipação</th><th>Recebido</th></tr>
+            </thead>
+            <tbody id="c1-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="note" id="c1-note">
+          <b>Como calculamos:</b> cada parcela sofre primeiro o desconto da taxa mensal contratada; depois, o desconto da antecipação, proporcional aos dias entre a venda e a data em que a parcela seria paga normalmente (juros simples: taxa × dias/30). O cronograma de liquidação (D+30, D+31 etc.) usado aqui é uma aproximação de mercado — confirme com o time financeiro/jurídico da Acanto o cronograma real de recebíveis antes de publicar este módulo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULADORA 2 -->
+  <div class="panel" id="t2">
+    <div class="grid">
+      <div class="form-card">
+        <div class="field">
+          <label for="c2-bruto">Valor bruto da venda</label>
+          <div class="input-row">
+            <span class="suffix" style="left:12px;right:auto;">R$</span>
+            <input type="number" id="c2-bruto" value="1000" min="1" step="1" style="padding-left:36px;">
+          </div>
+          <p class="err" id="c2-bruto-err">Informe um valor bruto válido.</p>
+        </div>
+        <div class="field">
+          <label for="c2-liquido">Valor líquido recebido</label>
+          <div class="input-row">
+            <span class="suffix" style="left:12px;right:auto;">R$</span>
+            <input type="number" id="c2-liquido" value="940" min="0" step="1" style="padding-left:36px;">
+          </div>
+          <p class="err" id="c2-liquido-err">Informe um valor líquido válido.</p>
+          <p class="err" id="c2-err">O líquido não pode ser maior que o bruto.</p>
+        </div>
+        <div class="field">
+          <label for="c2-prazo">Prazo até o recebimento original (opcional)</label>
+          <div class="input-row">
+            <input type="number" id="c2-prazo" value="" min="1" step="1" placeholder="ex: 30">
+            <span class="suffix">dias</span>
+          </div>
+          <p class="hint">Se informado, também mostramos a taxa equivalente ao mês.</p>
+        </div>
+      </div>
+
+      <div class="simple-card">
+        <span class="stamp">Taxa real da operação</span>
+        <div class="headline-rate">
+          <span class="num" id="c2-taxatotal">6,0%</span>
+          <span class="label">de desconto total sobre o valor bruto</span>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="m-label">Valor bruto</div>
+            <div class="m-val" id="c2-m-bruto">R$ 1.000,00</div>
+          </div>
+          <div class="metric hot">
+            <div class="m-label">Custo total retido</div>
+            <div class="m-val" id="c2-m-custo">R$ 60,00</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">Valor líquido</div>
+            <div class="m-val" id="c2-m-liquido">R$ 940,00</div>
+          </div>
+          <div class="metric" id="c2-mensal-card" style="display:none;">
+            <div class="m-label">Equivalente ao mês</div>
+            <div class="m-val" id="c2-m-mensal">—</div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:22px;">
+          <b>Como calculamos:</b> taxa total = (bruto − líquido) / bruto. Quando o prazo é informado, a taxa mensal equivalente usa composição: (bruto/líquido)^(30/prazo) − 1 — mesma lógica do CET, útil para comparar operações com prazos diferentes.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULADORA 4: QUANTO PRECISO VENDER -->
+  <div class="panel" id="t4">
+    <div class="grid">
+      <div class="form-card">
+        <div class="field">
+          <label for="c4-liquido">Valor líquido que preciso receber</label>
+          <div class="input-row">
+            <span class="suffix" style="left:12px;right:auto;">R$</span>
+            <input type="number" id="c4-liquido" value="1000" min="1" step="1" style="padding-left:36px;">
+          </div>
+          <p class="err" id="c4-liquido-err">Informe um valor líquido válido.</p>
+        </div>
+
+        <div class="field">
+          <label>Como a taxa foi contratada?</label>
+          <div class="seg" id="c4-mode-toggle">
+            <button type="button" class="seg-btn active" data-mode="combo">Mensal + antecipação</button>
+            <button type="button" class="seg-btn" data-mode="final">Taxa final direta</button>
+          </div>
+        </div>
+
+        <div id="c4-fields-combo">
+          <div id="c4-tier-fields">
+            <div class="field">
+              <label for="c4-tier1">Taxa na 1ª parcela <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+              <div class="input-row">
+                <input type="number" id="c4-tier1" value="1.50" min="0" step="0.01">
+                <span class="suffix">% a.m.</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="c4-tier2">Taxa de 2ª a 6ª parcela <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+              <div class="input-row">
+                <input type="number" id="c4-tier2" value="2.20" min="0" step="0.01">
+                <span class="suffix">% a.m.</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="c4-tier3">Taxa de 7ª a 12ª parcela (ou mais) <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+              <div class="input-row">
+                <input type="number" id="c4-tier3" value="2.80" min="0" step="0.01">
+                <span class="suffix">% a.m.</span>
+              </div>
+              <p class="hint">Deixe em branco a faixa que não se aplica — a simulação usa só as faixas preenchidas.</p>
+              <p class="err" id="c4-tiers-err">As taxas por faixa não podem ser negativas.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="c4-antecip">Taxa de antecipação</label>
+            <div class="input-row">
+              <input type="number" id="c4-antecip" value="1.99" min="0" step="0.01">
+              <span class="suffix">% a.m.</span>
+            </div>
+            <p class="err" id="c4-antecip-err">Informe uma taxa de antecipação válida (não pode ser negativa).</p>
+          </div>
+        </div>
+
+        <div id="c4-fields-final" style="display:none;">
+          <div class="field">
+            <label for="c4-final-taxa">Taxa final contratada</label>
+            <div class="input-row">
+              <input type="number" id="c4-final-taxa" value="4.5" min="0" step="0.01">
+              <span class="suffix">%</span>
+            </div>
+            <p class="err" id="c4-final-taxa-err">Informe uma taxa final válida (não pode ser negativa).</p>
+          </div>
+          <div class="field">
+            <label for="c4-final-prazo">Prazo de recebimento <span class="required-mark">*</span></label>
+            <div class="input-row">
+              <span class="suffix" style="left:12px;right:auto;">D+</span>
+              <input type="number" id="c4-final-prazo" value="1" min="0" step="1" style="padding-left:34px;">
+            </div>
+            <p class="hint">Obrigatório nesta opção.</p>
+            <p class="err" id="c4-final-prazo-err">Informe o prazo de recebimento.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="c4-parcelas">Número de parcelas</label>
+          <div class="input-row">
+            <input type="number" id="c4-parcelas" value="6" min="1" max="24" step="1">
+            <span class="suffix">x</span>
+          </div>
+          <p class="err" id="c4-err">Informe parcelas entre 1 e 24.</p>
+        </div>
+      </div>
+
+      <div class="simple-card">
+        <span class="stamp">Valor que você precisa vender</span>
+        <div class="headline-rate">
+          <span class="num" id="c4-bruto">R$ 1.088,26</span>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="m-label">Valor líquido desejado</div>
+            <div class="m-val" id="c4-m-liquido">R$ 1.000,00</div>
+          </div>
+          <div class="metric hot">
+            <div class="m-label">Custo total da operação</div>
+            <div class="m-val" id="c4-m-custo">R$ 88,26</div>
+          </div>
+        </div>
+        <div class="note" id="c4-note" style="margin-top:22px;">
+          <b>Como calculamos:</b> a taxa real total (mesma lógica das outras calculadoras) é a mesma proporção não importa o valor da venda — então invertemos a conta: valor bruto = líquido desejado ÷ (1 − taxa real).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULADORA 5: COMPARAR PROPOSTAS -->
+  <div class="panel" id="t5">
+    <div class="grid">
+      <div class="form-card">
+        <div class="field">
+          <label for="c5-bruto">Valor da venda (bruto)</label>
+          <div class="input-row">
+            <span class="suffix" style="left:12px;right:auto;">R$</span>
+            <input type="number" id="c5-bruto" value="1000" min="1" step="1" style="padding-left:36px;">
+          </div>
+          <p class="err" id="c5-bruto-err">Informe um valor de venda válido.</p>
+        </div>
+        <div class="field">
+          <label for="c5-parcelas">Número de parcelas</label>
+          <div class="input-row">
+            <input type="number" id="c5-parcelas" value="6" min="1" max="24" step="1">
+            <span class="suffix">x</span>
+          </div>
+          <p class="err" id="c5-err">Informe parcelas entre 1 e 24.</p>
+        </div>
+
+        <div class="field">
+          <label>Como as propostas foram cotadas?</label>
+          <div class="seg" id="c5-mode-toggle">
+            <button type="button" class="seg-btn active" data-mode="combo">Mensal + antecipação</button>
+            <button type="button" class="seg-btn" data-mode="final">Taxa final direta</button>
+          </div>
+        </div>
+
+        <div id="c5-fields-final" style="display:none;">
+          <div class="field">
+            <label for="c5-final-prazo">Prazo de recebimento <span class="required-mark">*</span></label>
+            <div class="input-row">
+              <span class="suffix" style="left:12px;right:auto;">D+</span>
+              <input type="number" id="c5-final-prazo" value="1" min="0" step="1" style="padding-left:34px;">
+            </div>
+            <p class="hint">Obrigatório nesta opção — vale para todas as propostas.</p>
+            <p class="err" id="c5-final-prazo-err">Informe o prazo de recebimento.</p>
+          </div>
+        </div>
+
+        <div class="field c5-combo-fields" style="border-top:1px solid var(--line);padding-top:16px;">
+          <label>Proposta A</label>
+          <div id="c5a-tier-wrap">
+            <div style="display:flex;gap:6px;">
+              <div class="input-row"><input type="number" id="c5a-tier1" value="1.50" min="0" step="0.01" placeholder="1ª"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5a-tier2" value="2.20" min="0" step="0.01" placeholder="2-6"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5a-tier3" value="2.80" min="0" step="0.01" placeholder="7-12"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5a-tier-antecip" value="1.99" min="0" step="0.01" placeholder="antecip."><span class="suffix">%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="field c5-final-fields" style="display:none;border-top:1px solid var(--line);padding-top:16px;">
+          <label>Proposta A — taxa final</label>
+          <div class="input-row"><input type="number" id="c5a-final-taxa" value="4.5" min="0" step="0.01"><span class="suffix">%</span></div>
+        </div>
+
+        <div class="field c5-combo-fields">
+          <label>Proposta B</label>
+          <div id="c5b-tier-wrap">
+            <div style="display:flex;gap:6px;">
+              <div class="input-row"><input type="number" id="c5b-tier1" value="1.20" min="0" step="0.01" placeholder="1ª"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5b-tier2" value="1.80" min="0" step="0.01" placeholder="2-6"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5b-tier3" value="2.40" min="0" step="0.01" placeholder="7-12"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5b-tier-antecip" value="2.90" min="0" step="0.01" placeholder="antecip."><span class="suffix">%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="field c5-final-fields" style="display:none;">
+          <label>Proposta B — taxa final</label>
+          <div class="input-row"><input type="number" id="c5b-final-taxa" value="5.2" min="0" step="0.01"><span class="suffix">%</span></div>
+        </div>
+
+        <div class="field c5-combo-fields">
+          <label>Proposta C <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+          <div id="c5c-tier-wrap">
+            <div style="display:flex;gap:6px;">
+              <div class="input-row"><input type="number" id="c5c-tier1" value="" min="0" step="0.01" placeholder="1ª"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5c-tier2" value="" min="0" step="0.01" placeholder="2-6"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5c-tier3" value="" min="0" step="0.01" placeholder="7-12"><span class="suffix">%</span></div>
+              <div class="input-row"><input type="number" id="c5c-tier-antecip" value="" min="0" step="0.01" placeholder="antecip."><span class="suffix">%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="field c5-final-fields" style="display:none;">
+          <label>Proposta C — taxa final <span style="font-weight:400;color:var(--muted);">(opcional)</span></label>
+          <div class="input-row"><input type="number" id="c5c-final-taxa" value="" min="0" step="0.01" placeholder="taxa final"><span class="suffix">%</span></div>
+        </div>
+
+        <p class="hint" id="c5-combo-hint">Cada proposta: 1ª parcela, 2ª–6ª, 7ª–12ª (todas opcionais — deixe em branco a faixa que não existe) e antecipação. Modo taxa final: um único campo por proposta.</p>
+        <p class="err" id="c5-tiers-err">As taxas informadas não podem ser negativas.</p>
+        <p class="err" id="c5-final-taxa-err">As taxas finais informadas não podem ser negativas.</p>
+      </div>
+
+      <div class="simple-card">
+        <span class="stamp">Ranking pela taxa real</span>
+        <div id="c5-ranking"></div>
+        <div class="note" id="c5-note" style="margin-top:18px;">
+          <b>Como calculamos:</b> cada proposta roda a mesma conta da primeira calculadora (taxa mensal + antecipação + parcelas) e é ordenada pela taxa real total — não pela taxa anunciada.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+function fmtBRL(v){
+  return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+function fmtPct(v){
+  return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+}
+
+document.querySelectorAll('.tab').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+function taxaPorFaixa(i, t1, t2, t3){
+  var v;
+  if(i===1){v=t1;}
+  else if(i<=6){v=t2;}
+  else{v=t3;}
+  return isNaN(v) ? 0 : v;
+}
+
+// Retorna true se algum dos valores preenchidos (não vazios/NaN) for negativo.
+function algumNegativo(vals){
+  return vals.some(function(v){ return !isNaN(v) && v<0; });
+}
+
+document.getElementById('c1-mode-toggle').addEventListener('click',function(e){
+  var btn = e.target.closest('.seg-btn');
+  if(!btn){return;}
+  document.querySelectorAll('#c1-mode-toggle .seg-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var mode = btn.dataset.mode;
+  document.getElementById('c1-fields-combo').style.display = mode==='combo' ? 'block' : 'none';
+  document.getElementById('c1-fields-final').style.display = mode==='final' ? 'block' : 'none';
+  calc1();
+});
+
+function calc1(){
+  var mode = document.querySelector('#c1-mode-toggle .seg-btn.active').dataset.mode;
+  var bruto = parseFloat(document.getElementById('c1-bruto').value);
+  var n = parseInt(document.getElementById('c1-parcelas').value,10);
+  var err = document.getElementById('c1-err');
+  var brutoErr = document.getElementById('c1-bruto-err');
+  var antecipErr = document.getElementById('c1-antecip-err');
+  var prazoErr = document.getElementById('c1-final-prazo-err');
+  prazoErr.style.display='none';
+
+  brutoErr.style.display = (isNaN(bruto) || bruto<=0) ? 'block' : 'none';
+  err.style.display = (!n || n<1 || n>24) ? 'block' : 'none';
+  if(isNaN(bruto) || bruto<=0 || !n || n<1 || n>24){
+    return;
+  }
+
+  var rows='', totalLiquido=0, totalCustoLinha1=0, totalCustoLinha2=0;
+
+  if(mode==='combo'){
+    var taxaA = parseFloat(document.getElementById('c1-antecip').value);
+    antecipErr.style.display = (isNaN(taxaA) || taxaA<0) ? 'block' : 'none';
+    if(isNaN(taxaA) || taxaA<0){return;}
+
+    var t1v = parseFloat(document.getElementById('c1-tier1').value);
+    var t2v = parseFloat(document.getElementById('c1-tier2').value);
+    var t3v = parseFloat(document.getElementById('c1-tier3').value);
+    var tiersErr = document.getElementById('c1-tiers-err');
+    if(algumNegativo([t1v,t2v,t3v])){
+      tiersErr.style.display='block';
+      return;
+    }
+    tiersErr.style.display='none';
+    var partes = [];
+    if(!isNaN(t1v)){partes.push('1ª '+fmtPct(t1v));}
+    if(!isNaN(t2v)){partes.push('2ª–6ª '+fmtPct(t2v));}
+    if(!isNaN(t3v)){partes.push('7ª–12ª '+fmtPct(t3v));}
+    document.getElementById('c1-nominal').textContent = (partes.length ? 'Taxa por faixa: '+partes.join(' · ') : 'Nenhuma faixa preenchida (0% assumido)')+' · Antecipação: '+fmtPct(taxaA)+' a.m.';
+
+    document.getElementById('c1-l-mensal-label').textContent = '(–) Taxa mensal contratada (por faixa de parcelas)';
+    document.getElementById('c1-l-antecip-row').style.display = 'flex';
+    document.getElementById('c1-th-mensal').textContent = 'Após taxa mensal';
+    document.getElementById('c1-th-antecip').textContent = 'Custo antecipação';
+    document.getElementById('c1-note').innerHTML = '<b>Como calculamos:</b> cada parcela sofre o desconto da taxa mensal contratada na sua faixa (1ª, 2ª–6ª ou 7ª–12ª); faixas deixadas em branco são consideradas 0% (sem custo mensal naquela faixa). Depois, o desconto da antecipação, proporcional aos dias entre a venda e a data em que a parcela seria paga normalmente (juros simples: taxa × dias/30). O cronograma de liquidação (D+30, D+31 etc.) usado aqui é uma aproximação de mercado — confirme com o time financeiro/jurídico da Acanto o cronograma real de recebíveis antes de publicar este módulo.';
+
+    for(var i=1;i<=n;i++){
+      var parcelaBruta = bruto/n;
+      var taxaMi = taxaPorFaixa(i,t1v,t2v,t3v);
+      var aposMensal = parcelaBruta*(1-taxaMi/100);
+      var custoAntecip = aposMensal*(taxaA/100)*i;
+      var recebido = aposMensal-custoAntecip;
+      totalLiquido += recebido;
+      totalCustoLinha2 += custoAntecip;
+      totalCustoLinha1 += (parcelaBruta-aposMensal);
+      rows += '<tr><td>'+i+'/'+n+'</td><td>'+fmtBRL(parcelaBruta)+'</td><td>'+fmtBRL(aposMensal)+'</td><td>'+fmtBRL(custoAntecip)+'</td><td>'+fmtBRL(recebido)+'</td></tr>';
+    }
+  } else {
+    antecipErr.style.display='none';
+    document.getElementById('c1-tiers-err').style.display='none';
+    var taxaFinal = parseFloat(document.getElementById('c1-final-taxa').value);
+    var finalTaxaErr = document.getElementById('c1-final-taxa-err');
+    var prazo = document.getElementById('c1-final-prazo').value;
+    if(prazo===''||prazo===null||isNaN(parseFloat(prazo))||parseFloat(prazo)<0){
+      prazoErr.style.display='block';
+      return;
+    }
+    prazoErr.style.display='none';
+    finalTaxaErr.style.display = (isNaN(taxaFinal) || taxaFinal<0) ? 'block' : 'none';
+    if(isNaN(taxaFinal) || taxaFinal<0){return;}
+    prazo = parseFloat(prazo);
+
+    document.getElementById('c1-l-mensal-label').textContent = '(–) Taxa final aplicada';
+    document.getElementById('c1-l-antecip-row').style.display = 'none';
+    document.getElementById('c1-th-mensal').textContent = 'Custo (taxa final)';
+    document.getElementById('c1-th-antecip').textContent = 'Prazo';
+    document.getElementById('c1-nominal').textContent = 'Taxa final contratada: '+fmtPct(taxaFinal)+' · Recebimento em D+'+prazo;
+    document.getElementById('c1-note').innerHTML = '<b>Como calculamos:</b> a taxa final já é o percentual total combinado (financiamento da parcela + antecipação) informado pelo próprio cliente, aplicado igualmente sobre cada parcela: recebido = bruto × (1 − taxa final). O prazo de recebimento é exibido para dar contexto de quão rápido esse dinheiro cai na conta, mas não altera o valor da taxa — que já é o número final contratado.';
+
+    for(var j=1;j<=n;j++){
+      var pBruta = bruto/n;
+      var pRecebida = pBruta*(1-taxaFinal/100);
+      var pCusto = pBruta-pRecebida;
+      totalLiquido += pRecebida;
+      totalCustoLinha1 += pCusto;
+      rows += '<tr><td>'+j+'/'+n+'</td><td>'+fmtBRL(pBruta)+'</td><td>'+fmtBRL(pCusto)+'</td><td>D+'+prazo+'</td><td>'+fmtBRL(pRecebida)+'</td></tr>';
+    }
+  }
+
+  document.getElementById('c1-tbody').innerHTML = rows;
+  var taxaTotal = ((bruto - totalLiquido) / bruto) * 100;
+
+  document.getElementById('c1-taxareal').textContent = fmtPct(taxaTotal);
+  document.getElementById('c1-l-bruto').textContent = fmtBRL(bruto);
+  document.getElementById('c1-l-mensal').textContent = '– '+fmtBRL(totalCustoLinha1);
+  document.getElementById('c1-l-antecip').textContent = '– '+fmtBRL(totalCustoLinha2);
+  document.getElementById('c1-l-liquido').textContent = fmtBRL(totalLiquido);
+}
+
+function calc2(){
+  var bruto = parseFloat(document.getElementById('c2-bruto').value);
+  var liquido = parseFloat(document.getElementById('c2-liquido').value);
+  var prazo = parseFloat(document.getElementById('c2-prazo').value);
+  var err = document.getElementById('c2-err');
+  var brutoErr = document.getElementById('c2-bruto-err');
+  var liquidoErr = document.getElementById('c2-liquido-err');
+
+  brutoErr.style.display = (isNaN(bruto) || bruto<=0) ? 'block' : 'none';
+  liquidoErr.style.display = (isNaN(liquido) || liquido<0) ? 'block' : 'none';
+  if(isNaN(bruto) || bruto<=0 || isNaN(liquido) || liquido<0){return;}
+  if(liquido>bruto){err.style.display='block';return;}
+  err.style.display='none';
+
+  var custo = bruto-liquido;
+  var taxaTotal = (custo/bruto)*100;
+
+  document.getElementById('c2-taxatotal').textContent = fmtPct(taxaTotal);
+  document.getElementById('c2-m-bruto').textContent = fmtBRL(bruto);
+  document.getElementById('c2-m-custo').textContent = fmtBRL(custo);
+  document.getElementById('c2-m-liquido').textContent = fmtBRL(liquido);
+
+  var mensalCard = document.getElementById('c2-mensal-card');
+  if(prazo && prazo>0 && liquido>0){
+    var taxaMensal = (Math.pow(bruto/liquido, 30/prazo)-1)*100;
+    document.getElementById('c2-m-mensal').textContent = fmtPct(taxaMensal)+' a.m.';
+    mensalCard.style.display='block';
+  } else {
+    mensalCard.style.display='none';
+  }
+}
+
+['c1-bruto','c1-antecip','c1-parcelas','c1-final-taxa','c1-final-prazo','c1-tier1','c1-tier2','c1-tier3'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',calc1);
+});
+['c2-bruto','c2-liquido','c2-prazo'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',calc2);
+});
+
+function ratioLiquidoBruto(taxaMSource, taxaA, n){
+  var totalLiquido=0;
+  var getM = (typeof taxaMSource === 'function') ? taxaMSource : function(){return taxaMSource;};
+  for(var i=1;i<=n;i++){
+    var parcelaBruta = 1/n;
+    var aposMensal = parcelaBruta*(1-getM(i)/100);
+    var custoAntecip = aposMensal*(taxaA/100)*i;
+    totalLiquido += aposMensal-custoAntecip;
+  }
+  return totalLiquido;
+}
+
+document.getElementById('c4-mode-toggle').addEventListener('click',function(e){
+  var btn = e.target.closest('.seg-btn');
+  if(!btn){return;}
+  document.querySelectorAll('#c4-mode-toggle .seg-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var mode = btn.dataset.mode;
+  document.getElementById('c4-fields-combo').style.display = mode==='combo' ? 'block' : 'none';
+  document.getElementById('c4-fields-final').style.display = mode==='final' ? 'block' : 'none';
+  calc4();
+});
+
+function calc4(){
+  var mode = document.querySelector('#c4-mode-toggle .seg-btn.active').dataset.mode;
+  var liquidoDesejado = parseFloat(document.getElementById('c4-liquido').value);
+  var n = parseInt(document.getElementById('c4-parcelas').value,10);
+  var err = document.getElementById('c4-err');
+  var liquidoErr = document.getElementById('c4-liquido-err');
+  var antecipErr = document.getElementById('c4-antecip-err');
+  var prazoErr = document.getElementById('c4-final-prazo-err');
+  prazoErr.style.display='none';
+
+  liquidoErr.style.display = (isNaN(liquidoDesejado) || liquidoDesejado<=0) ? 'block' : 'none';
+  err.style.display = (!n || n<1 || n>24) ? 'block' : 'none';
+  if(isNaN(liquidoDesejado) || liquidoDesejado<=0 || !n || n<1 || n>24){
+    return;
+  }
+
+  var ratio;
+  if(mode==='combo'){
+    var taxaA = parseFloat(document.getElementById('c4-antecip').value);
+    antecipErr.style.display = (isNaN(taxaA) || taxaA<0) ? 'block' : 'none';
+    if(isNaN(taxaA) || taxaA<0){return;}
+    var t1v4 = parseFloat(document.getElementById('c4-tier1').value);
+    var t2v4 = parseFloat(document.getElementById('c4-tier2').value);
+    var t3v4 = parseFloat(document.getElementById('c4-tier3').value);
+    var tiersErr4 = document.getElementById('c4-tiers-err');
+    if(algumNegativo([t1v4,t2v4,t3v4])){
+      tiersErr4.style.display='block';
+      return;
+    }
+    tiersErr4.style.display='none';
+    ratio = ratioLiquidoBruto(function(i){return taxaPorFaixa(i,t1v4,t2v4,t3v4);}, taxaA, n);
+    document.getElementById('c4-note').innerHTML = '<b>Como calculamos:</b> a taxa real total (mesma lógica das outras calculadoras) é a mesma proporção não importa o valor da venda — então invertemos a conta: valor bruto = líquido desejado ÷ (1 − taxa real). Faixas de parcelas deixadas em branco são consideradas 0%.';
+  } else {
+    antecipErr.style.display='none';
+    document.getElementById('c4-tiers-err').style.display='none';
+    var taxaFinal = parseFloat(document.getElementById('c4-final-taxa').value);
+    var finalTaxaErr4 = document.getElementById('c4-final-taxa-err');
+    var prazo = document.getElementById('c4-final-prazo').value;
+    if(prazo===''||prazo===null||isNaN(parseFloat(prazo))||parseFloat(prazo)<0){
+      prazoErr.style.display='block';
+      return;
+    }
+    prazoErr.style.display='none';
+    finalTaxaErr4.style.display = (isNaN(taxaFinal) || taxaFinal<0) ? 'block' : 'none';
+    if(isNaN(taxaFinal) || taxaFinal<0){return;}
+    prazo = parseFloat(prazo);
+    ratio = 1-(taxaFinal/100);
+    document.getElementById('c4-note').innerHTML = '<b>Como calculamos:</b> com a taxa final direta, valor bruto = líquido desejado ÷ (1 − taxa final). Recebimento em D+'+prazo+' — exibido como contexto, não altera a conta.';
+  }
+  if(ratio<=0){return;}
+  var brutoNecessario = liquidoDesejado/ratio;
+  var custo = brutoNecessario-liquidoDesejado;
+
+  document.getElementById('c4-bruto').textContent = fmtBRL(brutoNecessario);
+  document.getElementById('c4-m-liquido').textContent = fmtBRL(liquidoDesejado);
+  document.getElementById('c4-m-custo').textContent = fmtBRL(custo);
+}
+
+document.getElementById('c5-mode-toggle').addEventListener('click',function(e){
+  var btn = e.target.closest('.seg-btn');
+  if(!btn){return;}
+  document.querySelectorAll('#c5-mode-toggle .seg-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var mode = btn.dataset.mode;
+  document.querySelectorAll('.c5-combo-fields').forEach(function(el){el.style.display = mode==='combo' ? 'block' : 'none';});
+  document.querySelectorAll('.c5-final-fields').forEach(function(el){el.style.display = mode==='final' ? 'block' : 'none';});
+  document.getElementById('c5-fields-final').style.display = mode==='final' ? 'block' : 'none';
+  document.getElementById('c5-combo-hint').style.display = mode==='combo' ? 'block' : 'none';
+  calc5();
+});
+
+function calc5(){
+  var mode = document.querySelector('#c5-mode-toggle .seg-btn.active').dataset.mode;
+  var bruto = parseFloat(document.getElementById('c5-bruto').value);
+  var n = parseInt(document.getElementById('c5-parcelas').value,10);
+  var err = document.getElementById('c5-err');
+  var brutoErr = document.getElementById('c5-bruto-err');
+  var prazoErr = document.getElementById('c5-final-prazo-err');
+  prazoErr.style.display='none';
+
+  brutoErr.style.display = (isNaN(bruto) || bruto<=0) ? 'block' : 'none';
+  err.style.display = (!n || n<1 || n>24) ? 'block' : 'none';
+  if(isNaN(bruto) || bruto<=0 || !n || n<1 || n>24){
+    return;
+  }
+
+  var results = [];
+
+  if(mode==='combo'){
+    document.getElementById('c5-note').innerHTML = '<b>Como calculamos:</b> cada proposta aplica a taxa mensal correspondente à faixa de cada parcela (1ª, 2ª–6ª, 7ª–12ª — faixas em branco contam como 0%) mais o custo da antecipação, e é ordenada pela taxa real total — não pela taxa anunciada.';
+    var propostasTier = [
+      {nome:'Proposta A', t1:'c5a-tier1', t2:'c5a-tier2', t3:'c5a-tier3', antecipId:'c5a-tier-antecip'},
+      {nome:'Proposta B', t1:'c5b-tier1', t2:'c5b-tier2', t3:'c5b-tier3', antecipId:'c5b-tier-antecip'},
+      {nome:'Proposta C', t1:'c5c-tier1', t2:'c5c-tier2', t3:'c5c-tier3', antecipId:'c5c-tier-antecip'}
+    ];
+    var tiersErr5 = document.getElementById('c5-tiers-err');
+    var temNegativoTier = false;
+    propostasTier.forEach(function(p){
+      var taxaA = parseFloat(document.getElementById(p.antecipId).value);
+      if(isNaN(taxaA)){return;}
+      var pt1 = parseFloat(document.getElementById(p.t1).value);
+      var pt2 = parseFloat(document.getElementById(p.t2).value);
+      var pt3 = parseFloat(document.getElementById(p.t3).value);
+      if(taxaA<0 || algumNegativo([pt1,pt2,pt3])){
+        temNegativoTier = true;
+        return;
+      }
+      var ratio = ratioLiquidoBruto(function(i){return taxaPorFaixa(i,pt1,pt2,pt3);}, taxaA, n);
+      var taxaTotal = (1-ratio)*100;
+      var liquido = bruto*ratio;
+      var partes = [];
+      if(!isNaN(pt1)){partes.push('1ª '+fmtPct(pt1));}
+      if(!isNaN(pt2)){partes.push('2-6ª '+fmtPct(pt2));}
+      if(!isNaN(pt3)){partes.push('7-12ª '+fmtPct(pt3));}
+      results.push({nome:p.nome, sub:(partes.length?partes.join(' · '):'sem faixa mensal')+' + antecip. '+fmtPct(taxaA)+' · recebe '+fmtBRL(liquido), taxaTotal:taxaTotal});
+    });
+    tiersErr5.style.display = temNegativoTier ? 'block' : 'none';
+  } else {
+    document.getElementById('c5-tiers-err').style.display='none';
+    var prazo = document.getElementById('c5-final-prazo').value;
+    if(prazo===''||prazo===null||isNaN(parseFloat(prazo))||parseFloat(prazo)<0){
+      prazoErr.style.display='block';
+      return;
+    }
+    prazo = parseFloat(prazo);
+    document.getElementById('c5-note').innerHTML = '<b>Como calculamos:</b> cada proposta usa a taxa final direta (recebido = bruto × (1 − taxa final)) e é ordenada pela taxa real total. Prazo de recebimento informado: D+'+prazo+' para todas as propostas — exibido como contexto, não altera a conta.';
+    var propostasFinal = [
+      {nome:'Proposta A', id:'c5a-final-taxa'},
+      {nome:'Proposta B', id:'c5b-final-taxa'},
+      {nome:'Proposta C', id:'c5c-final-taxa'}
+    ];
+    var finalTaxaErr5 = document.getElementById('c5-final-taxa-err');
+    var temNegativoFinal = false;
+    propostasFinal.forEach(function(p){
+      var taxaFinal = parseFloat(document.getElementById(p.id).value);
+      if(isNaN(taxaFinal)){return;}
+      if(taxaFinal<0){temNegativoFinal = true; return;}
+      var liquido = bruto*(1-taxaFinal/100);
+      results.push({nome:p.nome, sub:'taxa final '+fmtPct(taxaFinal)+' · D+'+prazo+' · recebe '+fmtBRL(liquido), taxaTotal:taxaFinal});
+    });
+    finalTaxaErr5.style.display = temNegativoFinal ? 'block' : 'none';
+  }
+
+  results.sort(function(a,b){return a.taxaTotal-b.taxaTotal;});
+
+  var html='';
+  results.forEach(function(r,idx){
+    html += '<div class="rank-row"><div><div class="rk-name">'+r.nome+(idx===0?'<span class="badge">melhor</span>':'')+'</div><div class="rk-sub">'+r.sub+'</div></div><div class="rk-val">'+fmtPct(r.taxaTotal)+'</div></div>';
+  });
+  document.getElementById('c5-ranking').innerHTML = html || '<p class="hint">Preencha ao menos a Proposta A e B.</p>';
+}
+
+['c4-liquido','c4-antecip','c4-parcelas','c4-final-taxa','c4-final-prazo','c4-tier1','c4-tier2','c4-tier3'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',calc4);
+});
+['c5-bruto','c5-parcelas','c5a-final-taxa','c5b-final-taxa','c5c-final-taxa','c5-final-prazo','c5a-tier1','c5a-tier2','c5a-tier3','c5a-tier-antecip','c5b-tier1','c5b-tier2','c5b-tier3','c5b-tier-antecip','c5c-tier1','c5c-tier2','c5c-tier3','c5c-tier-antecip'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',calc5);
+});
+
+calc1();
+calc2();
+calc4();
+calc5();
+
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js', {scope: './'})
+      .catch(function (err) {
+        console.warn('Service Worker não registrado:', err);
+      });
+  });
+}
+</script>
+
+</body>
+</html>

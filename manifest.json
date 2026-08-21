@@ -1,0 +1,19 @@
+{
+  "name": "Calcule sua taxa real",
+  "short_name": "Taxa Real",
+  "description": "Calculadora de taxa real de operações com cartão.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F8FA",
+  "theme_color": "#10192E",
+  "icons": [
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
