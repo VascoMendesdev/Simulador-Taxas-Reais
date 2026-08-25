@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Calcule sua taxa real</title>
 
-<!-- Uso pessoal offline: sem manifesto/service worker externos, sem fontes externas —
-     tudo funciona a partir deste único arquivo, sem internet. -->
-<meta name="theme-color" content="#10192E">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Taxa Real">
+<!-- PWA completo: manifesto + service worker (arquivos separados,
+     precisam estar na mesma pasta publicada). O apple-touch-icon
+     abaixo usa base64 como reserva; se preferir, pode trocar por
+     href="icon-192.png" já que esse arquivo também foi entregue. -->
 <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#10192E">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAERklEQVR4nO3csW4TQRCH8TGioiGUocsLhDdC4smQeCOeIB0toqGmCDLG9px9d/ufnZ39vjaK76T93dzq4tzh4fHZiK71pvcJUN7AQW7gIDdwkBs4yA0c5AYOcnvb9/Dvn754P/r18jXyTOiyQ5eHYAsmLkNJr6JxrGJxGkTiC91zbJax83dpW0GTo+HSMkLCipgcbS96RkhYchyKtcRHTFoculXER0A8BCM3IQ71xc3wUKfCEbNy+JDGbYXcJDgiL2iGhy4mB7mBg9za44if89xZRDE5yA0c5AYOcgMHuYGD3MBBbuAgN3CQW3sc8d/x5Fulopgc5AYOcpPgiJzz3FN0MTnITYUj5oJmbEgTTg71yiFDHbcVctPi0F3cjI2A5JNDsYrIiCnittJ2LZERVujLW3Z+2RMWwYVuSPesbm0ZP398730KV+KdYP07yvjw8VPfMzmrD45jvE3wbGak8tEZx+RdvZvk8cFDsG55+4w8+w9w9GlZQBIf4OjQzbVPcmcBR3SjyDBwBDeQDANHZGPJMHCENZwMA0dMI8owcAQ0qAwDh7pxZRg4pA0tw8Cha3QZBg5RBWQYOBTVkGHgaF4ZGQaOtlWSYeBoWDEZBo5W1ZNh4GhSSRkGjv1VlWHg2FlhGQaOPdWWYeDYXHkZBo5tzSDDwLGhSWQYONY2jwwDx6qmkmHguL/ZZBg47mxCGQaOe5pThoHjZtPKMHAsN7MMA8dCk8swcHghw8BxNWS8Bo7zkHEMHP+FjNPA8S9knAWOvyHjMnCYIcMJHMhwmx0HMhaaGgcylpsXBzJuNikOZNzTjDiQcWfT4UDG/c2FAxmrmggHMtY2Cw5kbGgKHMjYVn0cyNhccRzI2FNlHMjYWVkcyNhfTRzIaFJBHMhoVTUcyGhYKRzIaFsdHMhoXhEcyFBUAQcyRA2PAxm6xsaBDGkD40CGulFxICOgIXEgI6bxcCAjrMFwICOykXAgI7hhcCAjvjFwIKNLA+BARq+y40BGx1LjQEbf8uJARveS4kBGhjLiQEaS0uFARp5y4UBGqhLhQEa2suBARsJS4EBGzvrjQEba+uNYXntkdOzw8Pjc+xzMnPkxiYxvT7+9H31+eRd5JmdlwWEXPsrLWDBxWRcliXDYiY/aMlaxOC2YSP89x2mvJpCh+N0N5ZoctWu4tDEjJNfkKFzbiz5mhIAjIsVaBvgAhzzdKqp9gIPcwKFNfXFLPx8cwmK2jbqjgIPcwKEq8oGV6FjgIDdwkBs4JAX/EUR0RHCQGzjIDRzkBg5yAwe5gYPcwEFu4CA3cEiK/08CxRHBQW7gIDdwqIq8s4iOBQ5yA4ewmOGhOwo4tKl9SD8fHOQGDnm6i1s9lsARkWIVAzY04Aiq7VrGbHV5BUN0O7/sGfn4hMkR3Z7VDf6TDZOjW7wTjG7H2wRpvNhzkBs4yA0c5AYOcgMHuYGD3MBBbn8AbsGngHlcEjQAAAAASUVORK5CYII=">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -325,15 +323,32 @@
   .seg-btn:last-child{border-right:none;}
   .seg-btn.active{background:var(--accent);color:#fff;}
   .required-mark{color:var(--alert);}
+  .install-btn{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    color:#fff;
+    background:var(--accent);
+    border:none;
+    border-radius:8px;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  .install-btn:hover{opacity:.92;}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="top">
-    <p class="eyebrow">Uso pessoal · Funciona offline</p>
-    <h1>Calcule sua taxa real</h1>
-    <p class="sub">Taxa mensal + antecipação automática quase nunca é igual à taxa que você pensa que está pagando. Simule abaixo e veja a diferença, linha por linha. Tudo roda no seu celular — nada é salvo nem enviado a lugar nenhum.</p>
+    <p class="eyebrow">Uso pessoal · Cálculo funciona offline</p>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1 style="margin-bottom:0;">Calcule sua taxa real</h1>
+      </div>
+      <button type="button" id="install-btn" class="install-btn" style="display:none;flex-shrink:0;">Instalar app</button>
+    </div>
+    <p class="sub" style="margin-top:10px;">Taxa mensal + antecipação automática quase nunca é igual à taxa que você pensa que está pagando. Simule abaixo e veja a diferença, linha por linha. O cálculo roda todo no seu celular; enviamos apenas um contador anônimo de uso (sem nome, CPF ou qualquer dado de contato) para saber se vale a pena continuar evoluindo este app.</p>
   </div>
 
   <div class="tabs">
@@ -461,7 +476,7 @@
         </div>
 
         <div class="note" id="c1-note">
-          <b>Como calculamos:</b> cada parcela sofre primeiro o desconto da taxa mensal contratada; depois, o desconto da antecipação, proporcional aos dias entre a venda e a data em que a parcela seria paga normalmente (juros simples: taxa × dias/30). O cronograma de liquidação (D+30, D+31 etc.) usado aqui é uma aproximação de mercado — confirme com o time financeiro/jurídico da Acanto o cronograma real de recebíveis antes de publicar este módulo.
+          <b>Como calculamos:</b> cada parcela sofre primeiro o desconto da taxa mensal contratada; depois, o desconto da antecipação, proporcional aos dias entre a venda e a data em que a parcela seria paga normalmente (juros simples: taxa × dias/30). O cronograma de liquidação (D+30, D+31 etc.) usado aqui é uma aproximação de mercado — confirme o cronograma real de recebíveis com a sua adquirente antes de divulgar publicamente este cálculo.
         </div>
       </div>
     </div>
@@ -827,7 +842,7 @@ function calc1(){
     document.getElementById('c1-l-antecip-row').style.display = 'flex';
     document.getElementById('c1-th-mensal').textContent = 'Após taxa mensal';
     document.getElementById('c1-th-antecip').textContent = 'Custo antecipação';
-    document.getElementById('c1-note').innerHTML = '<b>Como calculamos:</b> cada parcela sofre o desconto da taxa mensal contratada na sua faixa (1ª, 2ª–6ª ou 7ª–12ª); faixas deixadas em branco são consideradas 0% (sem custo mensal naquela faixa). Depois, o desconto da antecipação, proporcional aos dias entre a venda e a data em que a parcela seria paga normalmente (juros simples: taxa × dias/30). O cronograma de liquidação (D+30, D+31 etc.) usado aqui é uma aproximação de mercado — confirme com o time financeiro/jurídico da Acanto o cronograma real de recebíveis antes de publicar este módulo.';
+    document.getElementById('c1-note').innerHTML = '<b>Como calculamos:</b> cada parcela sofre o desconto da taxa mensal contratada na sua faixa (1ª, 2ª–6ª ou 7ª–12ª); faixas deixadas em branco são consideradas 0% (sem custo mensal naquela faixa). Depois, o desconto da antecipação, proporcional aos dias entre a venda e a data em que a parcela seria paga normalmente (juros simples: taxa × dias/30). O cronograma de liquidação (D+30, D+31 etc.) usado aqui é uma aproximação de mercado — confirme o cronograma real de recebíveis com a sua adquirente antes de divulgar publicamente este cálculo.';
 
     for(var i=1;i<=n;i++){
       var parcelaBruta = bruto/n;
@@ -1108,18 +1123,140 @@ calc2();
 calc4();
 calc5();
 
-</script>
+// ---- Contador de uso anônimo (medir interesse) ----
+// Troque pela URL da sua implantação do Apps Script (termina em /exec).
+// Enquanto não trocar, o contador fica desativado silenciosamente —
+// a calculadora continua funcionando 100% normal.
+var ANALYTICS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwiHxST3GkUObnnq27cT-23e7t-ZpxD6onyC5YWouvVs_bKWW0UZjBnUDG7uvcIY0I-/exec';
 
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./service-worker.js', {scope: './'})
-      .catch(function (err) {
-        console.warn('Service Worker não registrado:', err);
-      });
+function getUsuarioAnonimoId(){
+  var KEY = 'trAppUsuarioId';
+  var id = localStorage.getItem(KEY);
+  if(!id){
+    id = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem(KEY, id);
+  }
+  return id;
+}
+
+function enviarEvento(tipo, extra){
+  if(!ANALYTICS_ENDPOINT || ANALYTICS_ENDPOINT.indexOf('COLE_AQUI') === 0){ return; }
+  var payload = {
+    userId: getUsuarioAnonimoId(),
+    tipo: tipo,
+    timestampCliente: new Date().toISOString()
+  };
+  if(extra){
+    for(var k in extra){ payload[k] = extra[k]; }
+  }
+  // text/plain evita o preflight de CORS que o Apps Script não trata bem;
+  // o conteúdo continua sendo JSON válido, só o content-type é diferente.
+  fetch(ANALYTICS_ENDPOINT, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  }).catch(function(){
+    // Sem internet ou endpoint fora do ar: falha silenciosa,
+    // a calculadora não pode travar por causa do contador.
   });
 }
-</script>
 
+function debounceEvento(fn, delay){
+  var timer;
+  return function(){
+    var args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ fn.apply(null, args); }, delay);
+  };
+}
+
+var enviarSimulacaoC1 = debounceEvento(function(){
+  var mode = document.querySelector('#c1-mode-toggle .seg-btn.active').dataset.mode;
+  enviarEvento('simulacao', {
+    calculadora: 'taxa_mensal_antecipacao',
+    resumo: 'modo=' + mode + '; taxaReal=' + document.getElementById('c1-taxareal').textContent
+  });
+}, 1500);
+
+var enviarSimulacaoC2 = debounceEvento(function(){
+  enviarEvento('simulacao', {
+    calculadora: 'bruto_vs_liquido',
+    resumo: 'taxaReal=' + document.getElementById('c2-taxatotal').textContent
+  });
+}, 1500);
+
+var enviarSimulacaoC4 = debounceEvento(function(){
+  var mode = document.querySelector('#c4-mode-toggle .seg-btn.active').dataset.mode;
+  enviarEvento('simulacao', {
+    calculadora: 'quanto_preciso_vender',
+    resumo: 'modo=' + mode + '; brutoNecessario=' + document.getElementById('c4-bruto').textContent
+  });
+}, 1500);
+
+var enviarSimulacaoC5 = debounceEvento(function(){
+  var mode = document.querySelector('#c5-mode-toggle .seg-btn.active').dataset.mode;
+  enviarEvento('simulacao', {
+    calculadora: 'comparar_propostas',
+    resumo: 'modo=' + mode
+  });
+}, 1500);
+
+// Encadeia o envio de eventos às mesmas funções calc*, sem alterar o
+// código de cálculo em si — só "escuta" quando cada uma termina de rodar.
+['c1-bruto','c1-antecip','c1-parcelas','c1-final-taxa','c1-final-prazo','c1-tier1','c1-tier2','c1-tier3'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', enviarSimulacaoC1);
+});
+document.getElementById('c1-mode-toggle').addEventListener('click', function(){ enviarSimulacaoC1(); });
+
+['c2-bruto','c2-liquido','c2-prazo'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', enviarSimulacaoC2);
+});
+
+['c4-liquido','c4-antecip','c4-parcelas','c4-final-taxa','c4-final-prazo','c4-tier1','c4-tier2','c4-tier3'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', enviarSimulacaoC4);
+});
+document.getElementById('c4-mode-toggle').addEventListener('click', function(){ enviarSimulacaoC4(); });
+
+['c5-bruto','c5-parcelas','c5a-final-taxa','c5b-final-taxa','c5c-final-taxa','c5-final-prazo','c5a-tier1','c5a-tier2','c5a-tier3','c5a-tier-antecip','c5b-tier1','c5b-tier2','c5b-tier3','c5b-tier-antecip','c5c-tier1','c5c-tier2','c5c-tier3','c5c-tier-antecip'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', enviarSimulacaoC5);
+});
+document.getElementById('c5-mode-toggle').addEventListener('click', function(){ enviarSimulacaoC5(); });
+
+// Registra a visita assim que o app abre (uma vez por carregamento).
+enviarEvento('visita');
+
+// ---- PWA: registro do service worker + botão de instalar (Android/Chrome) ----
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(err){
+      console.log('Falha ao registrar service worker:', err);
+    });
+  });
+}
+
+var deferredInstallPrompt = null;
+var installBtn = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.style.display = 'inline-block';
+});
+
+installBtn.addEventListener('click', function(){
+  if(!deferredInstallPrompt){return;}
+  installBtn.style.display = 'none';
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.finally(function(){
+    deferredInstallPrompt = null;
+  });
+});
+
+window.addEventListener('appinstalled', function(){
+  installBtn.style.display = 'none';
+  deferredInstallPrompt = null;
+});
+
+</script>
 </body>
 </html>

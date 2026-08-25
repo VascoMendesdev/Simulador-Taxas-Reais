@@ -1,12 +1,12 @@
 {
   "name": "Calcule sua taxa real",
   "short_name": "Taxa Real",
-  "description": "Calculadora de taxa real de operações com cartão.",
-  "start_url": "./",
+  "description": "Simulador pessoal de taxa real de antecipação e parcelamento.",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#F7F8FA",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F5F1",
   "theme_color": "#10192E",
   "icons": [
     {
@@ -14,6 +14,12 @@
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
