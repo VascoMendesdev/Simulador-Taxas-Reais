@@ -1225,38 +1225,4 @@ document.getElementById('c5-mode-toggle').addEventListener('click', function(){ 
 // Registra a visita assim que o app abre (uma vez por carregamento).
 enviarEvento('visita');
 
-// ---- PWA: registro do service worker + botão de instalar (Android/Chrome) ----
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('service-worker.js').catch(function(err){
-      console.log('Falha ao registrar service worker:', err);
-    });
-  });
-}
-
-var deferredInstallPrompt = null;
-var installBtn = document.getElementById('install-btn');
-
-window.addEventListener('beforeinstallprompt', function(e){
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  installBtn.style.display = 'inline-block';
-});
-
-installBtn.addEventListener('click', function(){
-  if(!deferredInstallPrompt){return;}
-  installBtn.style.display = 'none';
-  deferredInstallPrompt.prompt();
-  deferredInstallPrompt.userChoice.finally(function(){
-    deferredInstallPrompt = null;
-  });
-});
-
-window.addEventListener('appinstalled', function(){
-  installBtn.style.display = 'none';
-  deferredInstallPrompt = null;
-});
-
-</script>
-</body>
-</html>
+// ---- PWA: registro do
