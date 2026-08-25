@@ -1170,59 +1170,105 @@ function debounceEvento(fn, delay){
   };
 }
 
-var enviarSimulacaoC1 = debounceEvento(function(){
+var simulacaoC1Fn = function(){
   var mode = document.querySelector('#c1-mode-toggle .seg-btn.active').dataset.mode;
   enviarEvento('simulacao', {
     calculadora: 'taxa_mensal_antecipacao',
     resumo: 'modo=' + mode + '; taxaReal=' + document.getElementById('c1-taxareal').textContent
   });
-}, 1500);
+};
+var enviarSimulacaoC1 = debounceEvento(simulacaoC1Fn, 1500);
 
-var enviarSimulacaoC2 = debounceEvento(function(){
+var simulacaoC2Fn = function(){
   enviarEvento('simulacao', {
     calculadora: 'bruto_vs_liquido',
     resumo: 'taxaReal=' + document.getElementById('c2-taxatotal').textContent
   });
-}, 1500);
+};
+var enviarSimulacaoC2 = debounceEvento(simulacaoC2Fn, 1500);
 
-var enviarSimulacaoC4 = debounceEvento(function(){
+var simulacaoC4Fn = function(){
   var mode = document.querySelector('#c4-mode-toggle .seg-btn.active').dataset.mode;
   enviarEvento('simulacao', {
     calculadora: 'quanto_preciso_vender',
     resumo: 'modo=' + mode + '; brutoNecessario=' + document.getElementById('c4-bruto').textContent
   });
-}, 1500);
+};
+var enviarSimulacaoC4 = debounceEvento(simulacaoC4Fn, 1500);
 
-var enviarSimulacaoC5 = debounceEvento(function(){
+var simulacaoC5Fn = function(){
   var mode = document.querySelector('#c5-mode-toggle .seg-btn.active').dataset.mode;
   enviarEvento('simulacao', {
     calculadora: 'comparar_propostas',
     resumo: 'modo=' + mode
   });
-}, 1500);
+};
+var enviarSimulacaoC5 = debounceEvento(simulacaoC5Fn, 1500);
 
 // Encadeia o envio de eventos às mesmas funções calc*, sem alterar o
 // código de cálculo em si — só "escuta" quando cada uma termina de rodar.
+// 'input' (debounced, 1.5s): captura enquanto a pessoa ainda está digitando.
+// 'change' (imediato, sem espera): dispara assim que o campo perde o foco —
+// evita depender de um temporizador sobreviver caso o app vá para segundo
+// plano (troca de aba/app) antes do debounce terminar, o que é comum em celular.
 ['c1-bruto','c1-antecip','c1-parcelas','c1-final-taxa','c1-final-prazo','c1-tier1','c1-tier2','c1-tier3'].forEach(function(id){
   document.getElementById(id).addEventListener('input', enviarSimulacaoC1);
+  document.getElementById(id).addEventListener('change', simulacaoC1Fn);
 });
-document.getElementById('c1-mode-toggle').addEventListener('click', function(){ enviarSimulacaoC1(); });
+document.getElementById('c1-mode-toggle').addEventListener('click', simulacaoC1Fn);
 
 ['c2-bruto','c2-liquido','c2-prazo'].forEach(function(id){
   document.getElementById(id).addEventListener('input', enviarSimulacaoC2);
+  document.getElementById(id).addEventListener('change', simulacaoC2Fn);
 });
 
 ['c4-liquido','c4-antecip','c4-parcelas','c4-final-taxa','c4-final-prazo','c4-tier1','c4-tier2','c4-tier3'].forEach(function(id){
   document.getElementById(id).addEventListener('input', enviarSimulacaoC4);
+  document.getElementById(id).addEventListener('change', simulacaoC4Fn);
 });
-document.getElementById('c4-mode-toggle').addEventListener('click', function(){ enviarSimulacaoC4(); });
+document.getElementById('c4-mode-toggle').addEventListener('click', simulacaoC4Fn);
 
 ['c5-bruto','c5-parcelas','c5a-final-taxa','c5b-final-taxa','c5c-final-taxa','c5-final-prazo','c5a-tier1','c5a-tier2','c5a-tier3','c5a-tier-antecip','c5b-tier1','c5b-tier2','c5b-tier3','c5b-tier-antecip','c5c-tier1','c5c-tier2','c5c-tier3','c5c-tier-antecip'].forEach(function(id){
   document.getElementById(id).addEventListener('input', enviarSimulacaoC5);
+  document.getElementById(id).addEventListener('change', simulacaoC5Fn);
 });
-document.getElementById('c5-mode-toggle').addEventListener('click', function(){ enviarSimulacaoC5(); });
+document.getElementById('c5-mode-toggle').addEventListener('click', simulacaoC5Fn);
 
 // Registra a visita assim que o app abre (uma vez por carregamento).
 enviarEvento('visita');
 
-// ---- PWA: registro do
+// ---- PWA: registro do service worker + botão de instalar (Android/Chrome) ----
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(err){
+      console.log('Falha ao registrar service worker:', err);
+    });
+  });
+}
+
+var deferredInstallPrompt = null;
+var installBtn = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.style.display = 'inline-block';
+});
+
+installBtn.addEventListener('click', function(){
+  if(!deferredInstallPrompt){return;}
+  installBtn.style.display = 'none';
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.finally(function(){
+    deferredInstallPrompt = null;
+  });
+});
+
+window.addEventListener('appinstalled', function(){
+  installBtn.style.display = 'none';
+  deferredInstallPrompt = null;
+});
+
+</script>
+</body>
+</html>
